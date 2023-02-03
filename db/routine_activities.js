@@ -1,11 +1,20 @@
 const client = require("./client");
+const { getRoutinesWithoutActivities } = require("./routines");
+const { getUserByUsername } = require("./users");
 
 async function addActivityToRoutine({
   routineId,
   activityId,
   count,
   duration,
-}) {}
+}) {
+  console.log("addActivityToRoutine Fields:", 
+  routineId,
+  activityId,
+  count,
+  duration)
+
+}
 
 async function getRoutineActivityById(id) {}
 
@@ -25,3 +34,12 @@ module.exports = {
   destroyRoutineActivity,
   canEditRoutineActivity,
 };
+
+//JOIN
+// SELECT * FROM  getRoutinesWithoutActivities
+// JOIN users ON getRoutinesWithoutActivities."creatorId" = users.id;
+// //
+
+// SELECT getUserByUsername.username AS "CreatorName", routines.*
+// FROM routines
+// JOIN users ON routines."creatorId" = users.id;
