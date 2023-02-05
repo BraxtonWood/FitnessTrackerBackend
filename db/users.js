@@ -5,7 +5,7 @@ const SALT_COUNT = 10;
 
 // user functions
 async function createUser({ username, password }) {
-  console.log("createUser username:", username, "password:", password)
+  //console.log("createUser username:", username, "password:", password)
   const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
   try {
     const {rows:[createdUser]} = await client.query(`
@@ -14,6 +14,7 @@ async function createUser({ username, password }) {
       ON CONFLICT (username) DO NOTHING
       RETURNING *;
     `, [username, hashedPassword]);
+    delete createdUser.password;
     return createdUser;
   } catch (error) {
     throw error;
@@ -21,12 +22,12 @@ async function createUser({ username, password }) {
 }
 
 async function getUser({ username, password }) {
-  console.log("getUser username:", username, "password:", password);
+  //console.log("getUser username:", username, "password:", password);
   try {
     const {rows:[user]} = await client.query(`
       SELECT * FROM users
-      WHERE username=${ username };
-    `);
+      WHERE username=$1;
+    `,[username]);
     console.log("user", user);
     const hashedPassword = user.password;
     let passwordsMatch = await bcrypt.compare(password, hashedPassword);
@@ -34,10 +35,11 @@ async function getUser({ username, password }) {
       delete user.password;
       return user;
     } else {
-      throw {
-        name: "PasswordIncorrectError",
-        message: "Password is incorrect for this user, please try again"
-      }
+      return false;
+      // throw {
+      //   name: "PasswordIncorrectError",
+      //   message: "Password is incorrect for this user, please try again"
+      // }
     }
   } catch (error) {
     throw error;
@@ -45,12 +47,13 @@ async function getUser({ username, password }) {
 }
 
 async function getUserById(userId) {
-  console.log("getUserById id:", userId);
+  //console.log("getUserById id:", userId);
   try {
     const {rows:[user]} = await client.query(`
       SELECT * FROM users
-      WHERE id=${ userId };
-      `);
+      WHERE id=$1;
+      `, [userId]);
+      delete user.password;
     return user;
   } catch (error) {
     throw error;
@@ -58,12 +61,12 @@ async function getUserById(userId) {
 }
 
 async function getUserByUsername(userName) {
-  console.log("getUserByUsername username:", userName);
+  //console.log("getUserByUsername username:", userName);
   try {
     const {rows:[user]} = await client.query(`
       SELECT * FROM users
-      WHERE username=${ userName };
-    `);
+      WHERE username=$1;
+    `,[userName]);
   return user;
 } catch (error) {
   throw error;

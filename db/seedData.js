@@ -20,6 +20,12 @@ const {
   createRoutine,
   updateRoutine,
   destroyRoutine,
+  getRoutineActivityById,
+  addActivityToRoutine,
+  getRoutineActivitiesByRoutine,
+  updateRoutineActivity,
+  destroyRoutineActivity,
+  canEditRoutineActivity,
  } = require('./');
 const client = require("./client")
 
@@ -70,8 +76,8 @@ async function createTables() {
     await client.query(`
     CREATE TABLE routine_activities (
       id SERIAL PRIMARY KEY,
-      "routineId" INTEGER REFERENCES routines(id) UNIQUE NOT NULL,
-      "activityId" INTEGER REFERENCES activities(id) UNIQUE NOT NULL,
+      "routineId" INTEGER REFERENCES routines(id),
+      "activityId" INTEGER REFERENCES activities(id),
       duration INTEGER,
       count INTEGER
       );

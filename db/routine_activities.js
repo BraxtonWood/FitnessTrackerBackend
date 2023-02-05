@@ -1,18 +1,21 @@
+const { getActivityById, attachActivitiesToRoutines } = require("./activities");
 const client = require("./client");
-const { getRoutinesWithoutActivities } = require("./routines");
+const { getRoutinesWithoutActivities, getRoutineById } = require("./routines");
 const { getUserByUsername } = require("./users");
 
 async function addActivityToRoutine({
   routineId,
   activityId,
   count,
-  duration,
+  duration
 }) {
-  console.log("addActivityToRoutine Fields:", 
-  routineId,
-  activityId,
-  count,
-  duration)
+  const {rows: routine_activity} = await client.query(`
+    INSERT INTO routine_activities ("routineId", "activityId", count, duration)
+    VALUES ($1, $2, $3, $4)
+    RETURNING *;
+    `, [routineId, activityId, count, duration])
+  //console.log("routine_activity",routine_activity);
+  return routine_activity;
 
 }
 
