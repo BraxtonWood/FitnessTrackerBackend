@@ -48,7 +48,9 @@ async function getAllRoutines() {
     `);
     //console.log("allRoutinesWITHOUTActivities:", routines);
     const allRoutinesWithActivities = await attachActivitiesToRoutines(routines);
-    //console.log("allRoutinesWithActivities:", allRoutinesWithActivities)
+    console.log("allRoutinesWithActivities:", allRoutinesWithActivities)
+    console.log("activities:", allRoutinesWithActivities[0].activities)
+
     return allRoutinesWithActivities;
   } catch (error){
     throw error
@@ -86,7 +88,7 @@ async function getAllRoutinesByUser({ username }) {
     WHERE users.username = ($1);
     `,[username]);
     const routineWithActivities = await attachActivitiesToRoutines(routines);
-    return routineWithActivities
+    return routineWithActivities;
   } catch (error){
     throw error
   }
@@ -101,7 +103,7 @@ async function getPublicRoutinesByUser({ username }) {
     WHERE users.username = ($1) AND routines."isPublic"=($2);
     `,[username, true]);
     const routineWithActivities = await attachActivitiesToRoutines(routines);
-    return routineWithActivities
+    return routineWithActivities;
   } catch (error){
     throw error
   }
@@ -109,22 +111,25 @@ async function getPublicRoutinesByUser({ username }) {
 
 async function getPublicRoutinesByActivity({ id }) {
   try {
-    const routines = await getAllPublicRoutines()
+    const routines = await getAllPublicRoutines();
     const routinesWActivities = await attachActivitiesToRoutines(routines);
     //for each routine
-    const sortByActivity = routinesWActivities.filter(routine => {
-      //console.log("routine", routine);
-      var containsActivity = false;
-      for (let i = 0; i < routine.activities.length; i++) {
-        if (routine.activities[i].id === id){
-          containsActivity = true;
-        }
-      }
-      return containsActivity;
-      
-    })
-    console.log("publicRoutinesByActivity:",sortByActivity)
-    return sortByActivity;
+    //const sortByActivity = await sortByActivityFunc(routinesWActivities, id);
+    const sortByActivity = (routinesWActivities.filter(routine => {
+                var containsActivity = false;
+                for (let i = 0; i < routine.activities.length; i++) {
+                  if (routine.activities[i].id === id){
+                    containsActivity = true;
+                  }
+                }
+                return containsActivity;
+              }))  
+    //console.log("sortByActivity1:", sortByActivity);
+    //console.log("get all routines:", await getAllPublicRoutines());
+    // if(!sortByActivity === []){
+    console.log("sortByActivity getPublicRoutinesByACtivity:",sortByActivity);
+    
+    return  sortByActivity;
   } catch (error){
     throw error
   }
@@ -156,7 +161,7 @@ async function updateRoutine({ id, ...fields }) {
 }
 
 async function destroyRoutine(id) {
-
+  try{
   const {rows:[routine_activities]} = await client.query(`
     DELETE FROM routine_activities
     WHERE "routineId"=${ id };
@@ -165,8 +170,9 @@ async function destroyRoutine(id) {
     DELETE FROM routines
     WHERE id=${ id };
     `);
-  
-
+  } catch (error){
+    throw error;
+  }
 }
 
 module.exports = {

@@ -28,18 +28,18 @@ async function getUser({ username, password }) {
       SELECT * FROM users
       WHERE username=$1;
     `,[username]);
-    console.log("user", user);
+   // console.log("user", user);
     const hashedPassword = user.password;
     let passwordsMatch = await bcrypt.compare(password, hashedPassword);
     if (passwordsMatch) {
       delete user.password;
       return user;
     } else {
-      return false;
-      // throw {
-      //   name: "PasswordIncorrectError",
-      //   message: "Password is incorrect for this user, please try again"
-      // }
+      throw {
+        name: "PasswordIncorrectError",
+        message: "Password is incorrect for this user, please try again",
+        error: "Password is incorrect for this user, please try again"
+      }
     }
   } catch (error) {
     throw error;

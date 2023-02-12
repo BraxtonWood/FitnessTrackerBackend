@@ -12,3 +12,5 @@ server.listen(PORT, () => {
     chalk.blueBright("Get your routine on!")
   )
 })
+
+module.exports = server;

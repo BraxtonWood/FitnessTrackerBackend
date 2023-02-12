@@ -4,22 +4,22 @@ const client = require('./client');
 async function createActivity({ name, description }) {
   //console.log("createActivity name:",name, "description:", description);
   // return the new activity
-
-
-
   //HANDLE POSSIBLE  REDUNDANCY: Cycling vs cycling
-
-
-
-
-
   try {
+    const {rows:[activityAlreadyExists]} = await client.query(`
+    SELECT EXISTS(SELECT * FROM activities
+      WHERE name = ($1));
+    `, [name]);
+    if(activityAlreadyExists.exists){
+      return true;
+    } else {
     const {rows:[newActivity]} = await client.query(`
       INSERT INTO activities (name, description)
       VALUES ($1, $2)
       RETURNING *;
     `, [name, description]);
     return newActivity;
+    }
   } catch (error) {
     throw error;
   }
@@ -68,6 +68,7 @@ async function attachActivitiesToRoutines(routines) {
   const binds = routines.map((routine, index) => `$${index+1}`).join(", ");
   //console.log("binds",binds);
   //get activities related to any of the routines passed in
+  try {
   const {rows: activities } = await client.query(`
     SELECT activities.*,
       routine_activities.duration,
@@ -90,18 +91,21 @@ async function attachActivitiesToRoutines(routines) {
   }
   //console.log("routinesWithActivities[0].activies:", routinesWithActivities[0].activities);
   return routinesWithActivities;
+} catch (error){
+  throw error;
+}
 }
 
 async function updateActivity({ id, ...fields }) {
-  console.log("updateActivity id:", id, "fields", fields);
+  //console.log("updateActivity id:", id, "fields", fields);
   // don't try to update the id
   // do update the name and description
   // return the updated activity
   const setString = Object.keys(fields).map(
     (key, index) => `"${ key }"=$${ index + 1 }`
   ).join(', ');
-  console.log("setString:", setString);
-  console.log("Obj.value(fiels):", Object.values(fields));
+  //console.log("setString:", setString);
+  //console.log("Obj.value(fiels):", Object.values(fields));
   if (setString.length === 0) {
     throw {
       name: "UpdateFieldsError",

@@ -187,7 +187,7 @@ describe("/api/routines", () => {
         "On Thursdays",
         "Until I fit into those pants"
       );
-
+ 
       const response = await request(app)
         .delete(`/api/routines/${fakeRoutine.id}`)
         .set("Authorization", `Bearer ${token}`);
