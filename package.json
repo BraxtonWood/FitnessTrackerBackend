@@ -9,7 +9,8 @@
     "start:dev": "nodemon server.js",
     "start": "node server.js",
     "test": "jest --runInBand",
-    "test:watch": "jest --runInBand --watchAll"
+    "test:watch": "jest --runInBand --watchAll",
+    "build": "npmi && npm run build"
   },
   "repository": {
     "type": "git",
