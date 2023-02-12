@@ -10,7 +10,7 @@
     "start": "node server.js",
     "test": "jest --runInBand",
     "test:watch": "jest --runInBand --watchAll",
-    "build": "npm i && npm run build"
+    "build": "npm i"
   },
   "repository": {
     "type": "git",
